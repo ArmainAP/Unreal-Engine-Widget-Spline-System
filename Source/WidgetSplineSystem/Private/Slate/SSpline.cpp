@@ -1,6 +1,9 @@
 // Copyright to Kat Code Labs, SRL. All Rights Reserved.
 
 #include "Slate/SSpline.h"
+#include "Data/SlatePaintContext.h"
+
+#include "SplineBuilder.h"
 
 void SSpline::Construct(const FArguments& InArguments)
 {
@@ -31,87 +34,75 @@ int32 SSpline::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry
 	const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId,
 	const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
-	const int32 NextLayerId = LayerId + 1;
 	const FSlateSpline& SplineRef = Spline.Get();
-	if (SplineRef.Points.Num() > 1)
+	if (SplineRef.Points.Num() < 2)
 	{
-		const ESlateDrawEffect DrawEffect = ShouldBeEnabled(bParentEnabled) ? ESlateDrawEffect::None : ESlateDrawEffect::DisabledEffect;
-		const FColor TintColor = SplineRef.Brush.TintColor.GetColor(InWidgetStyle).ToFColorSRGB();
-
-		if (SplineRef.Brush.GetResourceObject()->IsValidLowLevel())
-		{
-			PaintSplineBrush(AllottedGeometry, OutDrawElements, LayerId, DrawEffect, TintColor);
-		}
-		else
-		{
-			PaintSpline(AllottedGeometry, OutDrawElements, NextLayerId, DrawEffect, TintColor);	
-		}
+		return LayerId;
 	}
-	return NextLayerId;
+
+	const FSlatePaintContext PaintContext(OutDrawElements, AllottedGeometry.ToPaintGeometry(), LayerId + 1,
+		ShouldBeEnabled(bParentEnabled) ? ESlateDrawEffect::None : ESlateDrawEffect::DisabledEffect,
+		SplineRef.Brush.TintColor.GetColor(InWidgetStyle).ToFColorSRGB());
+
+	if (SplineRef.Brush.GetResourceObject()->IsValidLowLevel())
+	{
+		PaintSplineBrush(PaintContext);
+	}
+	else
+	{
+		PaintSplineSimple(PaintContext);
+	}
+	
+	return PaintContext.LayerId;
 }
 
-void SSpline::PaintSpline(const FGeometry& AllottedGeometry, FSlateWindowElementList& OutDrawElements,
-                          int32 LayerId, ESlateDrawEffect DrawEffect, const FColor& TintColor) const
+void SSpline::PaintSplineSimple(const FSlatePaintContext& InPaintContext) const
 {
 	const FSlateSpline& SplineRef = Spline.Get();
+	const auto& DrawSplineSegment = [&](const FSlateSplinePoint& SegmentStart, const FSlateSplinePoint& SegmentEnd){
+		const FVector2D& SegmentStartDirection = SplineRef.bIsLinear ? FVector2D::ZeroVector : SegmentStart.Direction;
+		const FVector2D& SegmentEndDirection = SplineRef.bIsLinear ? FVector2D::ZeroVector : SegmentEnd.Direction;
+		FSlateDrawElement::MakeSpline(
+				InPaintContext.OutDrawElements,
+				InPaintContext.LayerId,
+				InPaintContext.PaintGeometry,
+				SegmentStart.Location,
+				SegmentStartDirection,
+				SegmentEnd.Location,
+				SegmentEndDirection,
+				SplineRef.Brush.GetImageSize().X,
+				InPaintContext.DrawEffect,
+				InPaintContext.TintColor);
+	};
+	
 	for (int i = 0; i < SplineRef.Points.Num() - 1; i++)
 	{
-		FSlateSplinePoint SegmentStart = SplineRef.Points.Last();
-		FSlateSplinePoint SegmentEnd = SplineRef.Points[0];
-		if(SplineRef.bIsLinear)
-		{
-			SegmentStart.Direction = FVector2D::ZeroVector;
-			SegmentEnd.Direction = FVector2D::ZeroVector;
-		}
-		
-		if(ArePointsValid(SegmentStart.Location, SegmentEnd.Location))
-		{
-			FSlateDrawElement::MakeSpline(
-				OutDrawElements,
-				LayerId + 1,
-				AllottedGeometry.ToPaintGeometry(),
-				SegmentStart.Location,
-				SegmentStart.Direction,
-				SegmentEnd.Location,
-				SegmentEnd.Direction,
-				SplineRef.Brush.GetImageSize().X,
-				DrawEffect,
-				TintColor);	
-		}
+		DrawSplineSegment(SplineRef.Points[i], SplineRef.Points[i + 1]);
 	}
 	
 	if (SplineRef.bIsClosedLoop)
 	{
-		DrawSplineSegment(SplineRef.Points.Last(), SplineRef.Points[0], OutDrawElements, LayerId, AllottedGeometry, DrawEffect, TintColor);
+		DrawSplineSegment(SplineRef.Points.Last(), SplineRef.Points[0]);
 	}
 }
 
-void SSpline::DrawSplineSegment(const FSlateSplinePoint& SegmentStart, const FSlateSplinePoint& SegmentEnd, FSlateWindowElementList& OutDrawElements, uint32
-                                LayerId, const FGeometry& AllottedGeometry, ESlateDrawEffect DrawEffects, const FLinearColor& TintColor) const
+void SSpline::PaintSplineBrush(const FSlatePaintContext& InPaintContext) const
 {
 	const FSlateSpline& SplineRef = Spline.Get();
-	if(ArePointsValid(SegmentStart.Location, SegmentEnd.Location))
+	FSplineBuilder SplineBuilder(1.0f, InPaintContext);
+	
+	for (int i = 0; i < SplineRef.Points.Num() - 1; i++)
 	{
-		FSlateDrawElement::MakeSpline(
-			OutDrawElements,
-			LayerId + 1,
-			AllottedGeometry.ToPaintGeometry(),
-			SegmentStart.Location,
-			SplineRef.bIsLinear ? FVector2D::ZeroVector : SegmentStart.Direction,
-			SegmentEnd.Location,
-			SplineRef.bIsLinear ? FVector2D::ZeroVector : SegmentEnd.Direction,
-			SplineRef.Brush.GetImageSize().X,
-			DrawEffects,
-			TintColor);	
+		SplineBuilder.BuildBezierGeometry(SplineRef.Points[i], SplineRef.Points[i + 1], SplineRef.bIsLinear);
 	}
-}
+	
+	if (SplineRef.bIsClosedLoop)
+	{
+		SplineBuilder.BuildBezierGeometry(SplineRef.Points.Last(), SplineRef.Points[0], SplineRef.bIsLinear);
+	}
 
-void SSpline::PaintSplineBrush(const FGeometry& AllottedGeometry, FSlateWindowElementList& OutDrawElements,
-                               int32 LayerId, ESlateDrawEffect DrawEffect, const FColor& TintColor) const
-{
-}
-
-bool SSpline::ArePointsValid(const FVector2D& A, const FVector2D& B)
-{
-	return A.X != -FLT_MAX && A.Y != -FLT_MAX && B.X != -FLT_MAX && B.Y != -FLT_MAX;
+	SplineBuilder.Finish();
+	
+	const FSlateResourceHandle& RenderResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(SplineRef.Brush);
+	FSlateDrawElement::MakeCustomVerts(InPaintContext.OutDrawElements, InPaintContext.LayerId, RenderResourceHandle, SplineBuilder.GetVertexArray(), SplineBuilder.GetIndexArray(), nullptr, 0, 0, InPaintContext.DrawEffect);
 }
