@@ -1,9 +1,9 @@
 // Copyright to Kat Code Labs, SRL. All Rights Reserved.
 
 #include "Slate/SSpline.h"
-#include "Data/SlatePaintContext.h"
 
-#include "SplineBuilder.h"
+#include "Data/SlatePaintContext.h"
+#include "Slate/SplineBuilder.h"
 
 void SSpline::Construct(const FArguments& InArguments)
 {
@@ -89,7 +89,7 @@ void SSpline::PaintSplineSimple(const FSlatePaintContext& InPaintContext) const
 void SSpline::PaintSplineBrush(const FSlatePaintContext& InPaintContext) const
 {
 	const FSlateSpline& SplineRef = Spline.Get();
-	FSplineBuilder SplineBuilder(1.0f, InPaintContext);
+	FSplineBuilder SplineBuilder(SplineRef.Brush.GetImageSize(), InPaintContext);
 	
 	for (int i = 0; i < SplineRef.Points.Num() - 1; i++)
 	{
@@ -100,8 +100,7 @@ void SSpline::PaintSplineBrush(const FSlatePaintContext& InPaintContext) const
 	{
 		SplineBuilder.BuildBezierGeometry(SplineRef.Points.Last(), SplineRef.Points[0], SplineRef.bIsLinear);
 	}
-
-	SplineBuilder.Finish();
+	
 	
 	const FSlateResourceHandle& RenderResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(SplineRef.Brush);
 	FSlateDrawElement::MakeCustomVerts(InPaintContext.OutDrawElements, InPaintContext.LayerId, RenderResourceHandle, SplineBuilder.GetVertexArray(), SplineBuilder.GetIndexArray(), nullptr, 0, 0, InPaintContext.DrawEffect);
