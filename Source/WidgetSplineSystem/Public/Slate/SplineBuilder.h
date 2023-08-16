@@ -8,12 +8,12 @@
 #include "Data/SlateSplinePoint.h"
 
 /** Utility class for building a strip of triangles for a spline. */
-struct FSplineBuilder
+struct WIDGETSPLINESYSTEM_API FSplineBuilder
 {
 	FSplineBuilder(const FVector2D& InSize, const FSlatePaintContext& PaintContext);
 
-	void BuildBezierGeometry(const FSlateSplinePoint& SegmentStart, const FSlateSplinePoint& SegmentEnd, const bool bIsLinear);
-	void Finish(bool bCloseLoop);
+	void BuildBezierGeometry(FSlateSplinePoint SegmentStart, FSlateSplinePoint SegmentEnd, const bool bIsLinear);
+	void Finish(const bool bCloseLoop);
 
 	TArray<FSlateVertex>& GetVertexArray()
 	{
@@ -75,7 +75,6 @@ private:
 	static void deCasteljauSplit(const FVector2D P0, const FVector2D P1, const FVector2D P2, const FVector2D P3, FVector2D OutCurveParams[7]);
 
 	void Subdivide(const FVector2D P0, const FVector2D P1, const FVector2D P2, const FVector2D P3, float MaxBiasTimesTwo = 2.0f);
-
 	
 private:
 	const FSlateRenderTransform& RenderTransform;

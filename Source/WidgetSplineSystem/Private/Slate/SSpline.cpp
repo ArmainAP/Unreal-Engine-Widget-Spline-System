@@ -100,6 +100,8 @@ void SSpline::PaintSplineBrush(const FSlatePaintContext& InPaintContext) const
 	{
 		SplineBuilder.BuildBezierGeometry(SplineRef.Points.Last(), SplineRef.Points[0], SplineRef.bIsLinear);
 	}
+
+	SplineBuilder.Finish(SplineRef.bIsClosedLoop);
 	
 	
 	const FSlateResourceHandle& RenderResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(SplineRef.Brush);

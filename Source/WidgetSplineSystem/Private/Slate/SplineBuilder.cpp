@@ -12,21 +12,23 @@ FSplineBuilder::FSplineBuilder(const FVector2D& InSize, const FSlatePaintContext
 	HalfLineThickness = LineThickness / 2 + TextureCoord2.Y;
 }
 
-void FSplineBuilder::BuildBezierGeometry(const FSlateSplinePoint& SegmentStart, const FSlateSplinePoint& SegmentEnd,
-	const bool bIsLinear)
+void FSplineBuilder::BuildBezierGeometry(FSlateSplinePoint SegmentStart, FSlateSplinePoint SegmentEnd, const bool bIsLinear)
 {
-	const FVector2D& SegmentStartDirection = bIsLinear ? FVector2D::ZeroVector : SegmentStart.Direction;
-	const FVector2D& SegmentEndDirection = bIsLinear ? FVector2D::ZeroVector : SegmentEnd.Direction;
+	if (bIsLinear)
+	{
+		SegmentStart.Direction = FVector2D::ZeroVector;
+		SegmentEnd.Direction = FVector2D::ZeroVector;
+	}
 
 	// This is the same value that Unreal inside FSlateSplinePayload::SetHermiteSpline
 	constexpr float BezierControlPointScale = 3.0f;
-	const FVector2D P1 = SegmentStart.Location + SegmentStartDirection / BezierControlPointScale;
-	const FVector2D P2 = SegmentEnd.Location + SegmentEndDirection / BezierControlPointScale;
+	const FVector2D P1 = SegmentStart.Location + SegmentStart.Direction / BezierControlPointScale;
+	const FVector2D P2 = SegmentEnd.Location - SegmentEnd.Direction / BezierControlPointScale;
 		
 	Subdivide(SegmentStart.Location, P1, P2, SegmentEnd.Location, 1.0f);
 }
 
-void FSplineBuilder::Finish(bool bCloseLoop)
+void FSplineBuilder::Finish(const bool bCloseLoop)
 {
 	if (NumPointsAdded < 3)
 	{
@@ -47,7 +49,7 @@ void FSplineBuilder::Finish(bool bCloseLoop)
 
 		if (bCloseLoop)
 		{
-			const FSlateRenderTransform TempRenderTransform = FSlateRenderTransform(1.0f);
+			const FSlateRenderTransform& TempRenderTransform = FSlateRenderTransform(1.0f);
 			Vertices.Add(FSlateVertex::Make<ESlateVertexRounding::Disabled>(TempRenderTransform, Vertices[0].Position, FVector2f(1.0f, CurrentCoordV), TextureCoord2, SingleColor));
 			Vertices.Add(FSlateVertex::Make<ESlateVertexRounding::Disabled>(TempRenderTransform, Vertices[1].Position, FVector2f(0.0f, CurrentCoordV), TextureCoord2, SingleColor));
 		}
