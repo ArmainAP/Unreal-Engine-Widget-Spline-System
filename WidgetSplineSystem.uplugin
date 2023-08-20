@@ -19,6 +19,11 @@
 			"Name": "WidgetSplineSystem",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "WidgetSplineSystemEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }

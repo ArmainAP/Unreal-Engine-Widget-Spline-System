@@ -5,13 +5,15 @@
 struct WIDGETSPLINESYSTEM_API FSlatePaintContext
 {
 	FSlatePaintContext() = delete;
-	FSlatePaintContext(FSlateWindowElementList& OutDrawElements, const FPaintGeometry& InPaintGeometry, const int32 InLayerId, const ESlateDrawEffect InDrawEffect, const FColor InTintColor)
+	FSlatePaintContext(FSlateWindowElementList& OutDrawElements, const FGeometry& InGeometry, const int32 InLayerId, const ESlateDrawEffect InDrawEffect, const FColor InTintColor)
 		: OutDrawElements(OutDrawElements)
-		, PaintGeometry(InPaintGeometry)
+		, AllotedGeometry(InGeometry)
 		, DrawEffect(InDrawEffect)
 		, TintColor(InTintColor)
 		, LayerId(InLayerId)
-	{}
+	{
+		PaintGeometry = AllotedGeometry.ToPaintGeometry();
+	}
 
 	const FSlateRenderTransform& GetRenderTransform() const
 	{
@@ -20,8 +22,9 @@ struct WIDGETSPLINESYSTEM_API FSlatePaintContext
 	}
 
 	FSlateWindowElementList& OutDrawElements;
-	const FPaintGeometry& PaintGeometry;
+	const FGeometry& AllotedGeometry;
 	const ESlateDrawEffect DrawEffect;
 	const FColor TintColor;
-	const int32 LayerId;
+	FPaintGeometry PaintGeometry;
+	int32 LayerId;
 };

@@ -9,7 +9,7 @@ void USplineWidget::OnWidgetRebuilt()
 
 TSharedRef<SWidget> USplineWidget::RebuildWidget()
 {
-	SlateSpline = SNew(SSpline).Spline_UObject(this, &USplineWidget::GetSplineInfo);
+	SlateSpline = SNew(SSpline).Spline_UObject(this, &USplineWidget::GetSplineData);
 	return SlateSpline.ToSharedRef();
 }
 

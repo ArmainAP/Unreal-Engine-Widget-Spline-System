@@ -32,7 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Spline)
 	virtual void UpdateSpline();
 	
-	FSlateSpline GetSplineInfo() const { return SplineData; }
+	FSlateSpline GetSplineData() const { return SplineData; }
 	
 protected:
 	TSharedPtr<SSpline> SlateSpline;

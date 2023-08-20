@@ -27,6 +27,7 @@ FVector2D SSpline::ComputeDesiredSize(float LayoutScaleMultiplier) const
 		BoundingBox.Max.Y = FMath::Max(BoundingBox.Max.Y, SplinePoint.Location.Y);
 	}
 
+	// TODO: Apply offset to spline
 	return BoundingBox.GetSize();
 }
 
@@ -40,7 +41,7 @@ int32 SSpline::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry
 		return LayerId;
 	}
 
-	const FSlatePaintContext PaintContext(OutDrawElements, AllottedGeometry.ToPaintGeometry(), LayerId + 1,
+	const FSlatePaintContext PaintContext(OutDrawElements, AllottedGeometry, LayerId + 1,
 		ShouldBeEnabled(bParentEnabled) ? ESlateDrawEffect::None : ESlateDrawEffect::DisabledEffect,
 		SplineRef.Brush.TintColor.GetColor(InWidgetStyle).ToFColorSRGB());
 
@@ -65,7 +66,7 @@ void SSpline::PaintSplineSimple(const FSlatePaintContext& InPaintContext) const
 		FSlateDrawElement::MakeSpline(
 				InPaintContext.OutDrawElements,
 				InPaintContext.LayerId,
-				InPaintContext.PaintGeometry,
+				InPaintContext.AllotedGeometry.ToPaintGeometry(),
 				SegmentStart.Location,
 				SegmentStartDirection,
 				SegmentEnd.Location,
