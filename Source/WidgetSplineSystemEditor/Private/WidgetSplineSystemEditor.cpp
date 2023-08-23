@@ -1,7 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright to Kat Code Labs, SRL. All Rights Reserved.
 
 #include "WidgetSplineSystemEditor.h"
 #include "Logging.h"
+#include "SplineWidget.h"
+#include "SplineWidgetDetailsCustomization.h"
 
 #include "Modules/ModuleManager.h"
 
@@ -9,11 +11,19 @@
 
 void FWidgetSplineSystemEditor::StartupModule()
 {
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	PropertyModule.RegisterCustomClassLayout(USplineWidget::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&FSplineWidgetDetailCustomization::MakeInstance));
 }
 
 void FWidgetSplineSystemEditor::ShutdownModule()
 {
-	
+	if (!UObjectInitialized())
+	{
+		return;
+	}
+
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	PropertyModule.UnregisterCustomClassLayout(USplineWidget::StaticClass()->GetFName());
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -12,13 +12,15 @@ public class WidgetSplineSystemEditor : ModuleRules
 			{ 
 				"Core",
 				"CoreUObject",
-				"Engine", "WidgetSplineSystem"
+				"Engine", 
+				"WidgetSplineSystem",
+				"InputCore"
 			});
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Slate", "SlateCore"
+				"Slate", "SlateCore", "UnrealEd"
 			});
 		
 		DynamicallyLoadedModuleNames.AddRange(

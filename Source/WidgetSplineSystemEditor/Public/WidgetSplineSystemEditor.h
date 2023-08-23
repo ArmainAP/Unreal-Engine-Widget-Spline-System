@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright to Kat Code Labs, SRL. All Rights Reserved.
 
 #pragma once
 
@@ -8,9 +8,6 @@
 class FWidgetSplineSystemEditor : public IModuleInterface
 {
 public:
-
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
-	
+	virtual void StartupModule() override;
+	virtual void ShutdownModule() override;
 };

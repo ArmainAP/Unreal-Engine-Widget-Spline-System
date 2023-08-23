@@ -6,7 +6,6 @@
 
 DECLARE_DELEGATE_OneParam(FOnSplineDataChanged, const FSlateSpline&)
 
-
 class WIDGETSPLINESYSTEMEDITOR_API SSplineWidgetEditPanel : public SCompoundWidget
 {
 public:
@@ -20,6 +19,15 @@ public:
 
 	void Construct(const FArguments& InArgs);
 	virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
+
+	virtual FReply OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+
+	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
+	virtual void OnMouseCaptureLost(const FCaptureLostEvent& CaptureLostEvent) override;
 
 protected:
 	virtual void PaintSplineSimple(const FSlatePaintContext& InPaintContext) const;
@@ -36,7 +44,15 @@ protected:
 	                      bool bFitHorizontal,
 	                      bool bFitVertical);
 
+	static bool IsWithinBounds(const FVector2D& Position, const FVector2D& Point);
+	int GetSplinePointUnderPosition(const FVector2D& LocalPosition) const;
+	int GetSplineTangentUnderPosition(const FVector2D& LocalPosition, bool& bIsArrival) const;
+
+	void CreateContextMenu(const FGeometry& InMyGeometry, const FPointerEvent& InMouseEvent);
+
 protected:
+	static constexpr int32 INVALID_INDEX = -1;
+	
 	TAttribute<FSlateSpline> SplineData;
 	FOnSplineDataChanged OnSplineDataChanged;
 
@@ -57,4 +73,18 @@ protected:
 	} TransformInfo;
 
 	int SelectedPointIndex = 0;
+	bool bIsSelectedTangentArrival = false;
+	bool bIsPanelFocused = false;
+
+	enum class EDragState
+	{
+		None,
+		PreDrag,
+		DragKey,
+		DragTangent,
+		Pan,
+	} DragState = EDragState::None;
+
+	FVector2D LastMouseDownLocation;
+	FVector2D PreDragPointLocation;
 };
