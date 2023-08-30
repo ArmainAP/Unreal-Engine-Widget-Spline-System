@@ -37,6 +37,8 @@ We welcome contributions! If you have a feature request, bug report, or want to 
 
 This project is released under the AGPL-3.0 license.
 
+If you require a different license or have questions related to licensing, please reach out to adrian.popoviciu@katcodelabs.com.
+
 ## Credits
 
 Created by Adrian-Marian Popoviciu. A special thanks to the Unreal Engine community for their valuable feedback and contributions.
