@@ -33,12 +33,6 @@ Unreal-Engine-Widget-Spline-System is a free and open-source plugin for Unreal E
 
 We welcome contributions! If you have a feature request, bug report, or want to improve the plugin, please open an issue or send a pull request.
 
-## License
-
-This project is released under the AGPL-3.0 license.
-
-If you require a different license or have questions related to licensing, please reach out to adrian.popoviciu@katcodelabs.com.
-
 ## Credits
 
 Created by Adrian-Marian Popoviciu. A special thanks to the Unreal Engine community for their valuable feedback and contributions.
