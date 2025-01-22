@@ -15,18 +15,18 @@ struct WIDGETSPLINESYSTEM_API FSlateSpline
 		Brush.SetImageSize(FVector2D::UnitVector);
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spline Widget")
 	bool bIsLinear = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spline Widget")
 	bool bIsClosedLoop = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spline Widget")
 	TArray<FSlateSplinePoint> Points = {
 		FSlateSplinePoint(FVector2D(0.0f, 0.0f), FVector2D(200.0f, 0.0f)),
 		FSlateSplinePoint(FVector2D(200.0f, 200.0f), FVector2D(200.0f, 0.0f))
 	};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spline Widget")
 	FSlateBrush Brush = FSlateBrush();
 };

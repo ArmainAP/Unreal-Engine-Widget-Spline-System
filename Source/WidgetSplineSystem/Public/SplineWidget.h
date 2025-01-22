@@ -38,7 +38,7 @@ protected:
 	TSharedPtr<SSpline> SlateSpline;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spline Widget")
 	FSlateSpline SplineData = FSlateSpline();
 
 	UPROPERTY(Transient)
