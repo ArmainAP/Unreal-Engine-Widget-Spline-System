@@ -583,7 +583,7 @@ void SSplineWidgetEditPanel::CreateContextMenu(const FGeometry& InMyGeometry, co
 	
 	MenuBuilder.BeginSection("Actions", LOCTEXT("Actions", "Actions"));
 	
-	FUIAction AddPointAction = FUIAction(FExecuteAction::CreateLambda([=]()
+	FUIAction AddPointAction = FUIAction(FExecuteAction::CreateLambda([=, this]()
 	{
 		const FScopedTransaction Transaction(LOCTEXT("AddNewSplinePoint", "Add New Spline Point"));
 
